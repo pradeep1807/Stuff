@@ -1161,7 +1161,30 @@ docker build -t devimage:4 -< /cloud/dockerfile.tar.gz
 
 NOTE: Dockerfile class finish
 =================================================================
-Class15: 
+Class15: Docker Compose
+Task: It create mutliple container deploy with Docker Compose file via yaml file, It is like AWS Cloudformation
+
+docker-compose info
+search on google: docker-compose install Ref Link: https://docs.docker.com/compose/install/
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+docker-compose --version
+
+Task: Wordpress server setup via the help of Docker-comose
+
+
+
+
+
+
+
+
+
 
 
 
