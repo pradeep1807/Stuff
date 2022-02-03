@@ -1,0 +1,1252 @@
+#CLASS 1 & 2 Dahiya Docker
+
+yum install docker* -y
+
+systemctl enable docker
+systemctl start docker
+
+docker --version
+docker --help
+docker --info
+
+docker image ls
+docker network ls
+
+docker container run ubuntu #deploy ubuntu light weight images
+
+docker container ls #to show only running container
+docker container ls -a #to show all start and stop container
+
+docker container run ubuntu sleep 60 #docker deploy ubuntu images sleep into 60
+
+-> upper command freeze terminal
+
+-> below command not engage terminal
+docker container run -d ubuntu sleep 50 #d means detach mode
+
+docker container run -d -it ubuntu #it means interactive mode not stop container
+
+docker container stop d0de #to stop container with container id
+
+docker container start d0de #to start stops container with container id
+
+docker container restart d0de #to restart container with container id
+
+docker container rm d0de #to remove container with container id
+
+docker container rm dee3 4rf5 6tg3 #remove multiple container in same line
+
+NOTE: You can not running container, first of all you need to stop then you can remove container
+       Only forcefully you can remove container
+	   
+	   eg: docker container rm d0ef -f #f means forcefully
+	   
+docker container run -it ubuntu /bin/bash #container create and take access
+
+Container:
+apt-get install apache2
+
+cd /var/www/html
+echo "Welcome to my first application on docker container" > index.html
+
+service apache2 start
+
+docker container inspect 4rfg #to show IP Address 
+
+curl http://172.17.0.3
+Welcome to my first application on docker container
+
+#another container run and deploy application
+docker container run -it ubuntu /bin/bash
+
+Container:
+apt-get install apache2
+service apache2 start
+
+cd /var/www/html
+echo "Welcome 2nd application container" > index.html
+
+NOTE: With out stop container to exit
+
+docker container ls
+
+docker container top 44 #docker container top with container id
+
+docker container stats 44 #docker shows RAM Utilisation
+
+docker container stats #to show RAM Utilisation all container
+
+==================================================================================
+#Class 3  Port Mapping
+
+docker container run -it ubuntu /bin/bash 
+
+Container:
+apt-get install update
+
+apt-get install apache2
+
+cd /var/www/html
+echo "Welcome to Docker Container" > index.html
+
+service apache2 start
+
+docker container inspect 04rf #docker ip address find 
+curl with ip 
+
+#ifconfig #when you install docker daemon docker0 
+NOTE : You need to port mapping with eth0 ip address base machine with port, then we can access docker ip address on url
+
+docker container ls #to show port mapped or not
+
+docker container run -it -p 3600:80 ubuntu /bin/bash
+
+Container:
+apt-get install update
+apt-get install apache2
+
+cd /var/www/html
+echo "Welcome to port mapping into docker container" > index.html
+
+service apache2 start
+
+exit #container will stop / ctrl + p +q for exit without stop
+
+docker container ls
+
+OUTPUT
+
+Container ID    Image   Command      Created         Status       Ports               Name
+c75tgh4ed      ubuntu   "/bin/bash"   3 minute ago 3 minute ago 0.0.0.0:3600->80/tcp relaxed_beaver
+
+NOTE: We can not hit private ip outside AWS instance, we can hit only public ip with port of docker container
+
+-> Container name rename
+
+docker container ls
+
+docker container rename c75tgh4ed apacheserver
+
+docker container ls
+
+Container ID    Image   Command      Created         Status       Ports               Name
+c75tgh4ed      ubuntu   "/bin/bash"   3 minute ago 3 minute ago 0.0.0.0:3600->80/tcp  apacheserver
+
+-> We can build container according to name convention
+docker container run -it --name webserver ubuntu
+
+docker container attach apacheserver
+
+Container: ctrl p q
+
+docker container pause apacheserver #we can pause docker container
+
+docker container ls 
+
+docker container unpause apacheserver #we can unpause docker container
+
+docker container wait apacheserver
+
+docker container kill apacherserver #kill 
+
+NOTE: Kill -> Forcefully ; Stop-> Gracefully
+
+===================================
+Task: I want to copied tar file into container
+
+tar -cvzf redhat.tar /etc
+
+docker container ls
+
+docker container run -it ubuntu /bin/bash
+
+cd /tmp
+
+docker container ls #to find target container id for data(tar file) copied
+
+docker container cp redhat.tar 8316:/tmp
+
+docker container attach 8316
+
+Container: 
+cd /tmp
+ls #file found 
+
+Task> I want to provide this container to another server for deployment
+
+docker container export 8316 > web.tar
+
+ls
+web.tar  #docker container convert into tar file
+
+docker container export 8316 > web1.tar
+
+docker image import web.tar webimage #convert tar file into image
+
+docker image ls #to show 
+REPOSITORY  TAG   IMAGE ID  CREATED  SIZE
+webimage   latest  213l44   5 second ago 75MB
+ubuntu     latest  533l44   15 second ago 175MB
+
+docker container run -it webimage /bin/bash #docker run with REPOSITORY (webimage)
+
+cd /tmp #to check redhat.tar file exist in same
+==============================
+TASK> We can direct running container create without import
+
+docker container commit 8316 mywebimage
+
+docker image ls
+
+docker container run -it mywebimage /bin/bash
+
+Container: cd /tmp
+ls
+redhat.tar
+exit
+====================================================================================
+Class 4:  Docker hub
+
+Create account on docker hub.
+
+Task> Pull docker hin images on local linux server
+docker pull rhel7
+
+Task> Push docker images into docker hub. Need to tag this images
+
+docker tag mysql pradeepnicindia/webserver
+
+docker image ls
+
+docker image push pradeepnicindia/webserver
+
+NOTE: If you want verift where upload/push file go to my profile into dockerhub; check it
+
+docker login
+
+NOTE: Go to setting for delete any repository
+
+================================================================================
+Class 5: Docker Volume
+
+Linux Machine exist VM/Openstack/AWS/Azure/GCP
+
+1. Docker Volume Create for Incidently close Docker , don't lost data.
+2. Always Use SAN Storage for Docker Host lost to saved all data.
+If container lost, host lost data always saved on SAN
+
+AWS S3,google cloud storage,azure blob storage,NFS
+
+#Practical
+
+docker container run -it --name web-server ubuntu /bin/bash
+
+Container: 
+apt-get update
+
+apt-get install apache2
+ 
+cd /var/www/html
+echo "Welcome to docker volume topic" > index.html
+
+service apache2 start
+
+docker container inspect 123ddr #for find ip address and volume details
+
+curl 172.17.0.2 #docker ip address access for site reachable or not
+
+docker container rm -f 123ddr
+docker container ls
+docker volume ls
+
+#We can't access data from deleted container
+#Now we are creating docker volume
+docker volume --help
+
+docker volume create myvolume 
+
+docker volume ls
+docker volume inspect myvolume #to show where volume create on docker host
+
+##Create new container with volume attach
+docker container run -it -v myvolume:/tmp --name web-server ubuntu /bin/bash
+
+cd /tmp
+
+touch abc{1..10}
+ls 
+
+#cross check
+cd /var/lib/docker
+
+#again delete container
+docker container rm -f 65
+
+docker container ls
+
+docker container run -it -v myvolume:/tmp --name web-server1 
+
+cd /tmp
+ls
+
+#again delete
+docker container rm -f 9f
+
+#create docker image
+vi Dockerfile
+FROM ubuntu:14.04
+RUN apt-get update -y
+RUN apt-get install apache2 -y
+RUN service apache2 start
+
+docker image build -t myimage .
+
+docker image ls #we can check image build name is myimage
+
+docker volume ls
+
+docker volume inspect myvolume
+
+cd /var/lib/docker/volumes/myvolume/_data
+
+ls
+rm -rf *
+
+echo "Hello india" > index.html
+
+#we will use this file into new server as a setup of webhosting
+
+docker container run -it -v myvolume:/var/www/html myimage /bin/bash
+
+cd /var/www/html
+cat index.html
+
+docker container inspect 23 #to find ip it show only private ip of container
+
+#we can update our code into Docker host not a container, when we set volume on local machine(Docker host)
+
+#task2: database container setup
+docker image pull mysql
+
+docker image ls
+
+docker image inspect mysql #volume path /var/lib/mysql
+
+docker container run -it --name mydbserver -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql
+
+docker container exec -it mydbserver /bin/bash
+mysql
+mysql: show databases ;
+
+create database india;
+exit
+docker container ls
+docker volume ls
+ 
+DRIVER                 Volume Name
+local            mknrklnrlknrklnrlknrlknrklrn
+local            myvolume
+
+docker volume inspect mknrklnrlknrklnrlknrlknrklrn
+
+docker container ls #for inspect id find
+
+docker container inspect 31c1
+
+docker container rm -f 31c1
+docker container ls
+
+docker volume ls
+
+#we will create new database container create database volume attached
+
+docker container run -it -v mknrklnrlknrklnrlknrlknrklrn:/var/lib/mysql --name mynewdb -e MYSQL_ALLOW_EMPTY_PASSWORD mysql 
+
+docker container ls
+
+docker container exec -it mynewdb /bin/bash
+
+mysql
+
+mysql> show databases ;
+
+exit
+exit
+
+#task3: we can mount docker host directory into new docker container
+mkdir /mydir
+
+cd /mydir
+touch abc{1..10}
+mkdir abc{1..10}
+
+docker container run -it -v /mydir:/tmp ubuntu /bin/bash
+cd /tmp
+
+ls #here we can see all data from local (docker host) into container
+
+=================================================================================
+Class 6: Image pull into Docker hub Private REPOSITORY
+
+
+My-Company India Zone1 10.0.0.0/24
+docker container setup for zone1
+#hire devloper for custome image creation for docker container, we did not use any image for docker hub and share custome image in our environment
+steps1. docker create
+steps2. image build
+steps3. myimage
+
+My-Company UK Zone2 20.0.0.0/24
+docker container setup for zone2
+
+My-Company US Zone3 30.0.0.0/24
+docker container setup for zone3
+
+NOTE: If we push custom image into docker hub share to another company member used for it become public not to right method to share confidential image in public environment.
+
+setup docker private registry in environment on vm provide ip (10.0.0.32), installed docker daemon and then install docker registry server
+
+====================================================================================
+Class 7: Lab Image pull into docker hub Private REPOSITORY
+
+1. Create a VM on AWS All traffic, access server via root set password of root and change configuration sshd
+2. Login via ssh then install package
+yum install docker* -y
+systemctl enable docker 
+systemctl start docker
+
+docker image pull registry
+docker image pull nginx # for testing purpose
+docker image pull ubuntu  #for testing purpose
+
+docker image ls
+
+docker container run -itd -p 5000:5000 --name simple_resigtry registry
+docker container ls #for check container create or not
+
+docker image ls # i will push docker image (ubuntu & nginx) into docker registry
+
+yum install elinks #install elinks (web browser for command line) for docker hosts
+
+elinks
+127.0.0.1:5000/v2/_catalog
+
+2 times enter # check it not repository add any image
+
+docker image ls # we will create tag
+
+docker image tag nginx 127.0.0.1:5000/nginx
+
+docker image ls #show tag name
+
+docker image push 127.0.0.1:5000/nginx
+
+elinks
+127.0.0.1:5000/v2/_catalog
+#it show me image push successfully and show me
+
+docker image ls
+docker image tag ubuntu 127.0.0.1:5000/ubuntu
+
+docker image ls
+
+docker image push 127.0.0.1:5000/ubuntu
+
+elinks
+127.0.0.1:5000/v2/_catalog
+#it show me image push successfully and show me
+
+##If we create tag with local server ip ; it shows me error
+
+docker image push 172.31.90.197:5000/nginx
+Error: The push refers to repository [172.31.90.197:5000/nginx]
+Get https://172.31.90.197:5000/v2/: http: server gave HTTP response to HTTPS client
+
+vim daemon.json
+
+{
+	"insecure-registries" : ["172.31.90.197:5000"]
+}
+
+cp daemon.json /etc/docker 
+
+systemctl restart docker
+docker container ls
+
+docker confidential ls -a
+
+docker container start 12h4nk4n4n #start registry container
+
+docker container ls
+docker image push 172.31.90.197:5000/nginx
+
+docker image tag registry 172.31.90.197:5000/registry
+
+docker image push 172.31.90.197:5000/registry
+
+NOTE: Skip now https in which process only execute http not https
+==================================================================================
+Class 8: docker registry setup https
+
+docker image ls #check docker registry image exist or not
+
+#we will create certificate
+mkdir certs
+
+openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt
+
+#enter details as per ask above script
+
+cd certs
+#in which shows certificate created name as domain.crt and domain.key
+
+cd /etc/docker
+ls #show key.json
+
+mkdir certs.d
+
+cd certs.d/
+
+mkdir repo.docker.local:5000
+
+cd 
+
+cd certs/
+ls # show domain.crt and domain.key files
+
+cp domain.crt /etc/docker/certs.d/repo.docker.local\:5000/ca.crt
+
+cd
+
+systemctl restart docker
+
+docker container run -d -p 5000:5000 --name secure_regitry -v $(pwd)/certs/:certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e
+REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry #create docker registry
+
+docker container ls
+
+docker image ls
+
+docker image tag nginx repo.docker.local:5000/nginx
+
+docker image ls #check tag image name exist or not
+
+docker image push repo.docker.local:5000/nginx
+->> this show https setup but repo.docker.local not DNS resolved
+
+ifconfig #ip address copy
+
+vi /etc/hosts
+ip repo.docker.local # it will resolved DNS
+
+docker image push repo.docker.local:5000/nginx #successfully pushed image
+
+#for home task2 docker user based authentication for image pushed like dockerhub
+==========================================================================
+Class:9 Dockerfile with custom image
+
+vim Dockerfile
+
+or
+vim Dockerfile -f pradeep #pradeep is custom name for dockerfile
+
+vim Dockerfile
+FROM ubuntu:14.04
+RUN apt-get update && apt-get install -y apache2
+RUN apt-get install -y tree openssh-server openssh-client
+RUN cd /var/www/html
+RUN echo "Welcome to india" > /var/www/html
+RUN service apache2 start
+
+docker image build -t myimage:1 .
+=============================================================================
+Class:10 Docker file inspect check history and docker layer architecure
+
+docker container ls
+
+docker image ls #we will check docker image content
+
+docker image  history 64a4kjrrj #this shows all dockerfile contents updates
+
+mkdir dockerimage
+
+cd dockerimage
+
+vim Dockerfile  #if you use not Dockerfile name, your filename pradeep , you will use for build time i.e docker image build -t myimage:1 -f pradeep
+
+FROM ubuntu:14.04
+
+docker image build -t cloudknowledges:1 .
+
+#if we have ubuntu image already in Docker host , it will shows not changes
+
+#again reopen old dockerfile content update
+
+vim Dockerfile
+
+FROM ubuntu:14.04
+RUN touch abc
+
+#watch docker image ls ###for check docker image created or not
+
+docker image build -t cloudknowledges:2 .
+
+docker image history 350c1 #docker image history with docker id
+
+docker image ls # to show images
+
+docker container run -it ubuntu:14.04
+
+docker container run -it cloudknowledges:2
+
+ls #abc file is already created
+
+vi Dockerfile
+
+FROM ubuntu:14.04
+RUN touch abc
+RUN apt-get update && apt-get install -y apache2
+
+docker image build -t cloudknowledges:3 .
+
+docker image ls# it show container id
+
+docker image history 443n4lnr #to show inspect image
+
+docker container run -it cloudknowledges:3
+
+container# cd /var/www/html
+
+exit
+
+vi Dockerfile
+
+RUN ubuntu:14.04
+RUN touch abc
+RUN apt-get update && apt-get install -y apache2 tree openssh-client openssh-server python
+
+docker container run -it cloudknowledges:4
+
+docker image ls # to show container id
+
+docker image history 344k5n5 #docker inspect according to container id
+
+##another method to verify all package is installed or not
+
+docker container run -it cloudknowledges:4
+
+container: check via each command to run i.e; tree  and python
+
+--------------------------------------------------
+##Task: Docker image layer architecure
+
+#Solution: 1st Layer -> 2nd Layer -> 3rd Layer
+
+vi Dockerfile
+FROM centos
+RUN touch abc
+RUN touch abc1
+
+docker image build -t cloudknowledges:5 .
+
+docker image ls #to show image
+
+vi Dockerfile
+FROM centos
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+
+docker image build -t cloudknowledges:6 .
+
+vi Dockerfile
+FROM centos
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+
+docker image build -t cloudknowledges:7 .
+
+vi Dockerfile
+FROM centos
+RUN touch india
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+
+docker image build -t cloudknowledges:8 .
+
+NOTE: layer architecure not run cache when we add new line add top line
+
+
+vi Dockerfile
+FROM centos
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+
+docker image build -t cloudknowledges:9 .
+
+=========================================================================
+Class11: customization into dockerfile
+
+vi Dockerfile
+FROM centos
+LABEL Name="Pradep Kumar"
+LABEL Mobile="9876543210"
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+
+docker image build -t cloudknowledges:10 .
+
+docker image ls #to check docker image id for inspect find LABEL
+
+docker image inspect 32329dkr #we can see that label into docker image
+
+Task-> set environment variable into dockerfile
+
+vi Dockerfile
+FROM centos
+LABEL Name="Pradep Kumar"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+
+docker image build -t cloudknowledges:11 .
+
+docker image ls
+
+docker container run -it cloudknowledges:11 #we can check environment via this command
+
+Container: env
+
+Task: we can add user via the variable
+
+vi Dockerfile
+FROM centos
+LABEL Name="Pradep Kumar"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo "$Name:$Pass" | chapsswd
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+
+docker container run -it cloudknowledges:12
+
+Container: su - cloudknowledges
+Container: ls
+Container: exit
+
+Task: When container run it run from normal user
+
+vi Dockerfile
+FROM centos
+LABEL Name="Pradep Kumar"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo "$Name:$Pass" | chapsswd
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+USER $Name
+
+docker container run -it cloudknowledges:13
+
+Container: bu default provide shell of normal user
+
+Task: When container run it run from normal user with working directory predefined
+
+vi Dockerfile
+FROM centos
+LABEL Name="Pradep Kumar"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo "$Name:$Pass" | chapsswd
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+USER $Name
+WORKDIR /var/www/html
+
+docker image build -t cloudknowledges:14 .
+docker container run -it cloudknowledges:14
+
+Container:pwd
+/var/www/html
+
+Task: Create a file on dockerhost and paste into Container
+touch india
+
+vi Dockerfile
+FROM centos
+LABEL Name="Pradep Kumar"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo "$Name:$Pass" | chapsswd
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+USER $Name
+WORKDIR /var/www/html
+COPY india /var/www/html
+
+docker image build -t cloudknowledges:15 .
+docker container run -it cloudknowledges:15
+
+------
+Task: tar file copy dockerhost to Container
+
+Dockerhost:
+tar -cvzf docker.tar.gz /etc/ #create tarfile on dockerhost
+
+vi Dockerfile
+FROM centos
+LABEL Name="Pradep Kumar"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo "$Name:$Pass" | chapsswd
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+USER $Name
+WORKDIR /var/www/html
+COPY docker.tar.gz /var/www/html
+
+docker image build -t cloudknowledges:16 .
+docker container run -it cloudknowledges:16
+
+-----
+Task: ADD command to extract data in container
+
+Dockerhost:
+tar -cvzf docker.tar.gz /etc/ #create tarfile on dockerhost
+
+vi Dockerfile
+FROM centos
+LABEL Name="Pradep Kumar"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo "$Name:$Pass" | chapsswd
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+USER $Name
+WORKDIR /var/www/html
+ADD docker.tar.gz /var/www/html
+
+docker image build -t cloudknowledges:17 .
+docker container run -it cloudknowledges:17
+-----
+Task: Copy file link from below link via ADD commadnd and setup into docker container#
+
+Refer Link: https://www.free-css.com/free-css-templates/page251/ebusiness
+
+vi Dockerfile
+FROM centos
+LABEL Name="Pradep Kumar"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo "$Name:$Pass" | chapsswd
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+USER $Name
+WORKDIR /var/www/html
+ADD https://free-css.com/assests/files/free-css-templates/page251/ebusiness.zip /var/www/html
+
+docker image build -t cloudknowledges:18 .
+docker container run -it cloudknowledges:18
+
+-------
+
+Task: Copy file link from below link via Copy command and setup into docker container#
+
+Refer Link: https://www.free-css.com/free-css-templates/page251/ebusiness
+
+vi Dockerfile
+FROM centos
+LABEL Name="Pradep Kumar"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo "$Name:$Pass" | chapsswd
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+USER $Name
+WORKDIR /var/www/html
+COPY https://free-css.com/assests/files/free-css-templates/page251/ebusiness.zip /var/www/html
+
+docker image build -t cloudknowledges:19 .
+docker container run -it cloudknowledges:19
+
+Show error
+
+NOTE: COPY this command have not able to download via http link ; it have data locally exist on same path then it will working
+ADD it will like wget command data add http to local
+----
+Task: Container ready and execute  with first command#
+
+Refer Link: https://www.free-css.com/free-css-templates/page251/ebusiness
+
+vi Dockerfile
+FROM centos
+LABEL Name="Pradep Kumar"
+LABEL EmailID="pradeep.nicindia@gmail.com"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo "$Name:$Pass" | chapsswd
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN yum update -y && yum install -y httpd
+RUN yum install tree -y
+USER $Name
+CMD ["tree"]
+
+docker image build -t cloudknowledges:20 .
+docker container run -it cloudknowledges:20
+---------------------------------------------
+Task: Container ready and execute  with first command setup package#
+
+Refer Link: https://www.free-css.com/free-css-templates/page251/ebusiness
+
+vi Dockerfile
+FROM ubuntu:14.04
+LABEL Name="Pradep Kumar"
+LABEL EmailID="pradeep.nicindia@gmail.com"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo "$Name:$Pass" | chapsswd
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN apt-get update && install tree -y tree \
+   python
+CMD ["python"]
+
+docker image build -t cloudknowledges:21 .
+docker container run -it cloudknowledges:21
+---------------------------------------------
+Task: Container ready and execute  with first command setup package and last command execute#
+
+Refer Link: https://www.free-css.com/free-css-templates/page251/ebusiness
+
+vi Dockerfile
+FROM ubuntu:14.04
+LABEL Name="Pradep Kumar"
+LABEL EmailID="pradeep.nicindia@gmail.com"
+LABEL Mobile="9876543210"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo "$Name:$Pass" | chapsswd
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN apt-get update && install tree -y tree \
+   python
+CMD ["python"]
+CMD ["tree"]
+
+docker image build -t cloudknowledges:22 .
+docker container run -it cloudknowledges:22
+---------------------------------------------
+Class12: Docker Container ssh via Dockerfile defined port
+
+vi Dockerfile
+FROM ubuntu:14.04
+LABEL Name="Pradeep Kumar"
+LABEL EmailID="pradeep.nicindia@gmail.com"
+LABEL Mobile="988763536310"
+ENV Name=cloudknowledges
+ENV Pass=docker@2020
+RUN useradd $Name && echo $Name:$Pass | chpasswd
+RUN touch india
+RUN touch abc
+RUN touch abc1
+RUN touch abc2
+RUN touch abc3
+RUN apt-get update && apt-get install -y tree \
+    python \
+	openssh-server \
+	openssh-client 
+RUN mkdir -p /var/run/sshd
+EXPOSE 22
+CMD "/usr/sbin/sshd", "-D"
+
+docker image build -t cloudknowledges:50 .
+docker container run -itd cloudknowledges:50
+
+docker container ls #to show container id with port number
+docker container inspect jj3ltlnenfg #to check container ip address for ssh
+
+ssh cloudknowledges@172.17.0.3
+
+NOTE: We can this container ssh only Dockerhost not any container
+2. If we need this container ssh via outside so we need to set port mapping
+
+Dockerhost bridge container ip- 172.17.0.3
+Dockerhost ip - 172.31.80.145
+
+port mapping like
+
+docker host ip to docker container
+172.31.80.145:2222  ->  172.17.0.3:22
+
+Trick: to remove all contianer via 1 command
+docker container rm -f $(docker container ls -aq)
+
+##docker host port : docker container port 2222:22
+docker container run -itd -p 2222:22 cloudknowledges:51
+docker public ip for take ssh (aws server public ip)
+
+ssh cloudknowledges@54.86.22.23:2222
+
+
+-----
+Class13: Host a website via Dockerfile
+
+vi Dockerfile
+FROM centos:latest
+MAINTAINER pradeep.nicindia@gmail.com
+RUN yum install -y httpd \
+    zip \
+	unzip 
+ADD https://www.free-css.com/assests/files/free-css-templates/download/pages247/kindle.zip /var/www/html/
+WORKDIR /var/www/html
+RUN unzip kindle.zip
+RUN cp -rvf markups-kindle/* .
+CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+EXPOSE 80
+
+docker image build -t cloudknowledges:70 .
+docker container run -itd -p 8000:80 cloudknowledges:70 #build id number version is 70 here
+
+docker container ls
+
+docker container inspect nfnrkrnlkrn #to inspect for created container
+
+yum install elinks #elinks installed for docker host command line browser
+
+#if you want access this weblink you should to start via ssh public ip
+
+public ip:port -> docker host:port -> Container:port
+54.86.20.154:8000 -> 172.17.25.138:80 -> 172.17.0.3:8000
+=====================================================
+Class 14: Custom name keep for Dockerfile
+
+#Old method
+
+vi Dockerfile
+
+FROM ubuntu:14.04
+RUN touch abc
+
+docker image build -t devimage:1 . 
+
+mkdir /cloud
+cd /cloud
+ls
+mv * /cloud #Dockerfile move into /cloud directory
+
+docker image build -t devimage:1 -f /cloud/Dockerfile .
+OR
+docker image build -t devimage:1 -< /cloud/Dockerfile
+
+#Task: create self custom name for creation
+
+vi cloudknowledges
+
+FROM centos
+RUN touch abc
+
+docker image build -t devimage:2 -f cloudknowledges .
+
+mv cloudknowledges /cloud/
+cd /cloud
+
+docker image build -t devimage:3 -f /cloud/cloudknowledges .
+OR
+docker image build -t devimage:3 -< /cloud/cloudknowledges
+
+cd /cloud
+ls
+cloudknowledges Dockerfile
+tar -czvf cloudknowledges.tar.gz cloudknowledges #create tar file exist Dockerfile
+
+tar -czvf dockerfile.tar.gz Dockerfile
+
+ls #for cross check tar file created or not
+rm -rf cloudknowledges #remove dockerfile
+rm -rf Dockerfile
+
+Task: We can build image with out Dockerfile if we have tar file for same
+
+docker image build -t devimage:4 -f cloudknowledges -< /cloud/cloudknowledges.tar.gz #in which -f declare dockerfile name for build
+
+docker image build -t devimage:4 -< /cloud/dockerfile.tar.gz #reason that in which tar file by default name of Dockerfile
+
+NOTE: If we have multiple Dockerfile exist into tar file build through -f only Dockerfile and by default choose Dockerfile
+
+Task: for newtype build
+docker image build -t devmyimage:5 -<<EOF
+> FROM ubuntu:14.04
+> RUN apt-get update && apt-get install -y apache2
+> EOF
+
+docker image ls
+
+Task: If your image exist on http link, we build from below method
+
+docker image build -t devimage:6 -f cloudfile https://www.example.com/cloud/cloudfile
+
+NOTE: you don't need to enter image word for build by default it will do without image word
+
+docker build -t devimage:4 -< /cloud/dockerfile.tar.gz 
+
+NOTE: Dockerfile class finish
+=================================================================
+Class15: 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
